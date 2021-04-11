@@ -49,15 +49,19 @@ namespace ECommerceOrders.Services
             var result = new OrderDetails
             {
                 Customer = new CustomerDetails() { FirstName = customer.FirstName, LastName = customer.LastName },
-                Order = new CustomerOrder()
             };
 
             if (order != null)
             {
-                result.Order.DeliveryAddress = $"{customer.HouseNumber} {customer.Street}, {customer.Town}, {customer.Postcode}";
-                result.Order.OrderDate = order.OrderDate.HasValue ? order.OrderDate.Value.ToString("dd-MMM-yyyy") : string.Empty;
-                result.Order.OrderNumber = order.OrderId;
-                result.Order.DeliveryExpected = order.DeliveryExpected.HasValue ? order.DeliveryExpected.Value.ToString("dd-MMM-yyyy") : string.Empty;
+                result.Order = new CustomerOrder
+                {
+                    DeliveryAddress = $"{customer.HouseNumber} {customer.Street}, {customer.Town}, {customer.Postcode}",
+                    OrderDate = order.OrderDate.HasValue ? order.OrderDate.Value.ToString("dd-MMM-yyyy") : string.Empty,
+                    OrderNumber = order.OrderId,
+                    DeliveryExpected = order.DeliveryExpected.HasValue
+                        ? order.DeliveryExpected.Value.ToString("dd-MMM-yyyy")
+                        : string.Empty
+                };
                 if (order.OrderItems != null)
                 {
                     var isGift = order.ContainsGift.GetValueOrDefault(false);

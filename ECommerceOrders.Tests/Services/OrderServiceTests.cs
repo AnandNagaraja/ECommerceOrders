@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using ECommerceOrders.Controllers;
+﻿using System.Threading.Tasks;
 using ECommerceOrders.DAL.Entities;
-using ECommerceOrders.Exception;
 using ECommerceOrders.Models;
-using ECommerceOrders.Models.OrderDetails;
 using ECommerceOrders.Repositories;
 using ECommerceOrders.Services;
 using FluentAssertions;
@@ -75,7 +68,7 @@ namespace ECommerceOrders.Tests.Services
         }
 
         [TestMethod]
-        public async Task GetOrderDetailsByCustomerInfoAsync_Should_Return_OrderDetails()
+        public async Task GetOrderDetailsByCustomerInfoAsync_WithValid_Input_Should_Return_OrderDetails()
         {
 
             var customerInfo = new CustomerInfo() { CustomerId = "Customer123", User = "Test@Test.com" };
@@ -96,6 +89,51 @@ namespace ECommerceOrders.Tests.Services
             response.Order.Should().NotBeNull();
             response.Customer.Should().NotBeNull();
             response.Order.OrderItems.Should().NotBeNull();
+
+        }
+
+        [TestMethod]
+        public async Task GetOrderDetailsByCustomerInfoAsync_With_Null_Order_Should_Return_OnlyCustomerInfo()
+        {
+
+            var customerInfo = new CustomerInfo() { CustomerId = "Customer123", User = "Test@Test.com" };
+            var customer = Builder<Customer>.CreateNew().Build();
+            customer.CustomerId = customerInfo.CustomerId;
+
+            _userServiceMock.Setup(u => u.GetCustomerAsync(customerInfo.User))
+                .Returns(Task.FromResult(customer));
+
+            _orderRepositoryMock.Setup(o => o.GetOrderByCustomerIdAsync(customerInfo.CustomerId)).Returns(Task.FromResult<Order>(null));
+
+            var response = _orderService.GetOrderDetailsByCustomerInfoAsync(customerInfo).Result;
+
+            response.Should().NotBeNull();
+            response.Customer.Should().NotBeNull();
+            response.Order.Should().BeNull();
+
+        }
+
+        [TestMethod]
+        public async Task GetOrderDetailsByCustomerInfoAsync_With_Null_OrderItem_Should_Return_OrderDetails_without_OrderItem()
+        {
+
+            var customerInfo = new CustomerInfo() { CustomerId = "Customer123", User = "Test@Test.com" };
+
+            var order = Builder<Order>.CreateNew().Build();
+            var customer = Builder<Customer>.CreateNew().Build();
+            customer.CustomerId = customerInfo.CustomerId;
+
+            _userServiceMock.Setup(u => u.GetCustomerAsync(customerInfo.User))
+                .Returns(Task.FromResult(customer));
+
+            _orderRepositoryMock.Setup(o => o.GetOrderByCustomerIdAsync(customerInfo.CustomerId)).Returns(Task.FromResult(order));
+
+            var response = _orderService.GetOrderDetailsByCustomerInfoAsync(customerInfo).Result;
+
+            response.Should().NotBeNull();
+            response.Order.Should().NotBeNull();
+            response.Customer.Should().NotBeNull();
+            response.Order.OrderItems.Should().BeNull();
 
         }
 

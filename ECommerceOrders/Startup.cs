@@ -1,3 +1,5 @@
+using System;
+using ECommerceOrders.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using ECommerceOrders.Repositories;
 using ECommerceOrders.Services;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Swagger;
 
 
 namespace ECommerceOrders
@@ -38,7 +39,13 @@ namespace ECommerceOrders
                 .AddScoped<IUserService, UserService>()
                 .AddScoped<IOrderService, OrderService>()
                 .AddScoped<IOrderRepository, OrderRepository>()
-                .AddScoped<IBaseRepository<Order>, BaseRepository<Order>>();
+                .AddScoped<IBaseRepository<Order>, BaseRepository<Order>>()
+                .AddSingleton<IConfigurationRepository, ConfigurationRepository>();
+
+            //Todo: add the lifetime and and retryPolicy based on the requirement
+            //https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
+            services.AddHttpClient<IUserService, UserService>();
+
 
             // Register the swagger generator
             services.AddSwaggerGen(s =>

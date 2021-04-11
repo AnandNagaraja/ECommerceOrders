@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ECommerceOrders.Configuration;
 using ECommerceOrders.Exception;
 using ECommerceOrders.Models;
 using Microsoft.Extensions.Configuration;
@@ -15,16 +16,17 @@ namespace ECommerceOrders.Services
     {
 
         private readonly HttpClient _client;
-        private readonly IConfiguration _configuration;
+        private readonly IConfigurationRepository _configurationRepository;
         private string _baseUrl;
         private string _apiCode;
         private const string GetUserDetailsRoute = "GetUserDetails";
 
-        public UserService(IConfiguration configuration)
+        public UserService(HttpClient httpClient, IConfigurationRepository configurationRepository)
         {
-            _configuration = configuration;
-            _client = new HttpClient();
+            _configurationRepository = configurationRepository;
+            _client = httpClient;
         }
+
 
         public async Task<Customer> GetCustomerAsync(string customerEmailId)
         {
@@ -38,10 +40,10 @@ namespace ECommerceOrders.Services
         }
 
 
-        public string BuildCustomerApiUri(string customerEmail)
+        private string BuildCustomerApiUri(string customerEmail)
         {
-            _baseUrl ??= $"{_configuration.GetValue<string>("CustomerDetails:BaseUrl")}";
-            _apiCode ??= $"{_configuration.GetValue<string>("CustomerDetails:ApiKey")}";
+            _baseUrl ??= _configurationRepository.GetBaseUrl();
+            _apiCode ??= _configurationRepository.GetApiKey();
 
             return $"{_baseUrl}/{GetUserDetailsRoute}?code={_apiCode}&email={customerEmail}";
         }
