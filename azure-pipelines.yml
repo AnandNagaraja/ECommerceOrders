@@ -28,7 +28,17 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
+- script: dotnet test $(Build.SourcesDirectory)/ECommerceOrders --collect "Code coverage" --logger trx --settings $(Build.SourcesDirectory)/CodeCoverage.runsettings
+  displayName: Run Tests
+
 - task: VSTest@2
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+   
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish Compiled Artifact'
+  inputs:
+    TargetPath: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: Compiled
+        
