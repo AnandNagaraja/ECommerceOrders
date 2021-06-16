@@ -36,9 +36,18 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
    
+- task: DotNetCoreCLI@2
+  displayName: Publish
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: '**/ECommerceOrders.csproj'
+    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+    zipAfterPublish: false   
+   
 - task: PublishPipelineArtifact@1
   displayName: 'Publish Compiled Artifact'
   inputs:
     TargetPath: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: Compiled
+    ArtifactName: ECommerceOrdersBuild
         
