@@ -13,7 +13,6 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  QMSemVerPadded: $[dependencies.GitVersion.outputs['GitVersion.QMSemVerPadded']]  
 
 steps:
 - task: NuGetToolInstaller@1
@@ -51,7 +50,7 @@ steps:
   inputs:
     rootFolder: '$(Build.ArtifactStagingDirectory)\ECommerceOrders'
     includeRootFolder: false
-    archiveFile: '$(Build.ArtifactStagingDirectory)\Packages\ECommerceOrders_$(QMSemVerPadded).zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)\Packages\ECommerceOrders.zip'
         
 - task: PublishPipelineArtifact@1
   displayName: 'Publish Compiled Artifact'
