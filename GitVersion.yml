@@ -1,0 +1,37 @@
+mode: Mainline
+next-version: 1.0.0
+assembly-versioning-format: '{Major}.{Minor}.{Patch}.{env:BUILDCOUNT ?? 0}'
+assembly-informational-format: '{NuGetVersionV2}+Build.{env:BUILDCOUNT ?? 0}.Date.{CommitDate}.Branch.{env:SAFEBRANCHNAME ?? unknown}.Sha.{Sha}'
+commit-date-format: yyyyMMddTHHmmss
+commit-message-incrementing: MergeMessageOnly
+continuous-delivery-fallback-tag: useBranchName
+
+branches:
+  master: # Our default increment is the minor version
+    tag: '' # explicitly no tag for master builds
+    increment: Minor
+    is-mainline: true
+  release:
+    tag: 'rc' # Build as -RC: you must tag the final release commit
+    regex: releases?[/-]\d+\.\d+\.\d+
+    increment: None
+    source-branches: ['master']
+    is-release-branch: true
+  pull-requests:
+    regex: pull/
+    tag: pr
+    increment: inherit
+    source-branches: ['master', 'feature', 'release', 'hotfix']
+  hotfix: # magic: if you name your branch fix, hotfix, or fixes/issue we increment the patch version
+    regex: fix(es)?/
+    tag: useBranchName
+    increment: Patch
+    source-branches: ['master', 'feature']
+    track-merge-target: true
+  feature: # magic: normally, we assume it's a feature branch, and automatically increment the minor version
+    regex: .*/
+    tag: useBranchName
+    increment: Minor
+    source-branches: ['master', 'feature']
+    track-merge-target: true
+    tracks-release-branches: true
