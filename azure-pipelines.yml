@@ -22,12 +22,15 @@ steps:
   inputs:
     restoreSolution: '$(solution)'
 
-- task: VSBuild@1
+- task: DotNetCoreCLI@2
+  displayName: 'Build ECommerceOrders'
   inputs:
-    solution: '$(solution)'
-    msbuildArgs: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ECommerceOrders --runtime $(RuntimeTarget) --self-contained false'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    command: publish
+    publishWebProjects: false
+    projects: '**/*.csproj'
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ECommerceOrders --runtime $(RuntimeTarget) --self-contained false'
+    zipAfterPublish: false
+
 
 - script: dotnet test $(Build.SourcesDirectory)/ECommerceOrders --collect "Code coverage" --logger trx --settings $(Build.SourcesDirectory)/CodeCoverage.runsettings
   displayName: Run Tests
