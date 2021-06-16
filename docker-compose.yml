@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  ecommerceorders:
+    image: ${DOCKER_REGISTRY-}ecommerceorders
+    build:
+      context: .
+      dockerfile: ECommerceOrders\Dockerfile
